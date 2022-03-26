@@ -1,69 +1,136 @@
 
 let seconds = 0;
 
+let isPaused = false;
 
 const timer = document.getElementById('counter');
+let counterFunc = 0;
+let increment = () => {
+    if(!isPaused) {
+        seconds += 1;
+     timer.innerText = seconds; }
+}
+counterFunc = setInterval(increment, 1000);
 
-let counterFunc = setInterval(function() { 
-    seconds += 1;
-    timer.innerText = seconds;
-}, 1000);
-
-const decrease = document.getElementById('minus').addEventListener("click", minusFunc);
+const minusButton = document.getElementById('minus')
+const decrease = minusButton.addEventListener("click", minusFunc);
 
 function minusFunc() {
-seconds -= 10;
+    seconds -= 10;
 }
-const increase = document.getElementById('plus').addEventListener("click", plusFunc);
+
+const plusButton = document.getElementById('plus')
+const increase = plusButton.addEventListener("click", plusFunc);
 
 function plusFunc() {
-seconds += 10;
+    seconds += 10;
 }
+const heartButton = document.getElementById('heart')
+const like = heartButton.addEventListener("click", likeFunc);
 
-const like = document.getElementById('heart').addEventListener("click", likeFunc);
-
-let likes = 0;
+let likes = {};
 let timerCurrent = 0;
+
+const manageCount = (currentTime) => {
+
+    if (currentTime in likes){
+        likes[currentTime] += 1
+    } else {
+        likes[currentTime] = 1
+    }
+    console.log(likes);
+}
 
 function likeFunc() {
 
-    let timerCurrent = document.getElementById('counter').innerText;
-    let restart = document.getElementById('counter').innerText;
-
-    if(restart != timerCurrent) {
-
-        console.log("dsasd");
-    }
-
-    likes += 1;
     
     const currentTime = document.getElementById('counter').innerText;
-
    
-    let numOfLikes = `${currentTime} has been liked ${likes} times`;
+    manageCount(currentTime)
+    render()
+    }
 
-    const list = document.createElement('li');
+const render = () => {
+
+    document.querySelector('.likes').innerHTML = ''
     
-    list.innerText = numOfLikes;
-    
-    document.querySelector('.likes').appendChild(list);
+    for (const [key, value] of Object.entries(likes)) {
+        let numOfLikes = `${key} has been liked ${value} times`;
+        const list = document.createElement('li');
+        list.innerText = numOfLikes;
+        document.querySelector('.likes').appendChild(list);
+    }
+}
+
+
+let pauseButtonStatus = "counting";
+const pauseButton = document.getElementById('pause');
+
+pauseButton.addEventListener('click', () => {
+    if (pauseButtonStatus === 'counting') {
+        pauseButtonStatus = 'Stopped';
+        clearInterval(counterFunc);
+        pauseButton.innerHTML = 'resume';
+        plusButton.disabled = true;
+        minusButton.disabled = true;
+        // submitButton.disabled = true;
+        heartButton.disabled = true;
+    } else if (pauseButtonStatus === 'Stopped') {
+        counterFunc = setInterval(increment, 1000);
+        pauseButtonStatus = 'counting';
+        pauseButton.innerHTML = 'pause';
+        plusButton.disabled = false;
+        minusButton.disabled = false;
+        // submitButton.disabled = false;
+        heartButton.disabled = false;
+    }
+});
+
+const pause = () => {
+    document.getElementById('pause').addEventListener("click", event => pauseFunc());
+}
+
+const play = () => {
+     document.getElementById('play').addEventListener("click", event => playFunc());
 
     }
 
+function playFunc() {
+    const playButton = document.getElementById('play');
+    isPaused = false;
+   
+    playButton.setAttribute("id", "pause");
+   
+    playButton.textContent = "Pause";
+    
+   pause();
+}
 
-     const pause = document.getElementById('pause');
-    pause.addEventListener('click', pause => {
-        const button = document.querySelectorAll('button').forEach(btn => { 
-            
-            if(btn.id != "pause" ) {
-            btn.setAttribute("disabled", "true");
-            console.log(btn)
-        } else {
-            btn.innerHTML = "Play";
-            btn.className = "play";
-        }
-        });
+function pauseFunc() {
+    const pauseButton = document.getElementById('pause');
+    isPaused = true;
+
+    pauseButton.setAttribute("id", "play");
+
+    pauseButton.innerHTML = "Play";
+ play();
+}
 
 
-        // pause = document.getElementById('pause').disable = false;
-    });
+const leaveComment = () => {
+    const comment = document.getElementById("comment-input").value;
+    console.log(comment)
+    const commentList = document.getElementById("list");
+    const paraGraph = document.createElement("p");
+    paraGraph.innerText = comment;
+    commentList.appendChild(paraGraph);
+
+}
+
+const submit = document.getElementById('submit');
+submit.addEventListener('click', event => {
+    
+    event.preventDefault(); 
+
+    leaveComment();
+});
